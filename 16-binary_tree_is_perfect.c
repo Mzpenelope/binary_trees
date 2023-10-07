@@ -1,41 +1,71 @@
 #include "binary_trees.h"
+
+unsigned char is_leaf(const binary_tree_t *node);
+size_t depth(const binary_tree_t *tree);
+const binary_tree_t *get_leaf(const binary_tree_t *tree);
+int is_perfect_recursive(const binary_tree_t *tree,
+		size_t leaf_depth, size_t level);
+int binary_tree_is_perfect(const binary_tree_t *tree);
+
 /**
- * isPerfectTree - checks if a bianry treee is perfect
- ** @tree: pointer to root node of the tree to count the number of leaves
- ** @depth: the depth of the given node
- ** @level: node level
- ** Return: 1 SUCCESS, otherwise 0 (incl if tree is NULL)
- **************************************************************************/
-int isPerfectTree(const binary_tree_t *tree, int depth, int level)
+ * is_leaf - Checks if node is a l
+ * @node: A pointer
+ * Return: 0
+ */
+unsigned char is_leaf(const binary_tree_t *node)
 {
-binary_tree_t *a = tree->right, *b = tree->left;
-
-if (tree == NULL)
-return (0);
-
-if (b == NULL && a == NULL)
-{
-return (1);
-}
-if (binary_tree_depth(b) != binary_tree_depth(a))
-return (0);
-if (b == NULL || a == NULL)
-return (0);
-
-return (isPerfectTree(tree->left, depth, level + 1) &&
-			isPerfectTree(tree->right, depth, level + 1));
+	return ((node->left == NULL && node->right == NULL) ? 1 : 0);
 }
 /**
- * binary_tree_is_perfect - check if the node is perfect or not
- ** @tree: pointer to the root of the binary tree
- ** Return: 1 SUCCESS, otherwise 0 (incl if tree is NULL)
- *****************************************************************/
+ * depth - depth of a given node
+ * @tree: pointet
+ * Return: The depth of node.
+ */
+size_t depth(const binary_tree_t *tree)
+{
+	return (tree->parent != NULL ? 1 + depth(tree->parent) : 0);
+}
+
+/**
+ * get_leaf - Returns leaf
+ * @tree: pointer
+ * Return: to 1st encountered leaf.
+ */
+
+const binary_tree_t *get_leaf(const binary_tree_t *tree)
+{
+	if (is_leaf(tree) == 1)
+		return (tree);
+	return (tree->left ? get_leaf(tree->left) : get_leaf(tree->right));
+}
+
+/**
+ * is_perfect_recursive - Checks recutsive binary treed
+ * @tree: The pointer
+ * @leaf_depth: checks the depth
+ * @level: Level of current node
+ * Return: 1, else 0
+ */
+int is_perfect_recursive(const binary_tree_t *tree,
+		size_t leaf_depth, size_t level)
+{
+	if (is_leaf(tree))
+		return (level == leaf_depth ? 1 : 0);
+	if (tree->left == NULL || tree->right == NULL)
+		return (0);
+	return (is_perfect_recursive(tree->left, leaf_depth, level + 1) &&
+		is_perfect_recursive(tree->right, leaf_depth, level + 1));
+}
+
+/**
+ * binary_tree_is_perfect - Checks binary trer
+ * @tree: pointer
+ * Return: 0, otherwise, 1.
+ */
+
 int binary_tree_is_perfect(const binary_tree_t *tree)
 {
-int depth = 0;
-
-if (tree == NULL)
-return (0);
-depth = binary_tree_depth(tree);
-return (isPerfectTree(tree, depth, 0));
+	if (tree == NULL)
+		return (0);
+	return (is_perfect_recursive(tree, depth(get_leaf(tree)), 0));
 }
